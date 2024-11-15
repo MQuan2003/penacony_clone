@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:p_cf/screens/start/signin.dart';
-import 'package:p_cf/themes/statusbar.dart';
+
+import 'package:p_cf/widgets/status_bar.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});
@@ -14,9 +15,7 @@ class Welcome extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               const StatusBar(
-                  backgroundColor: Colors.blue,  // Màu thanh trạng thái
-                  isDarkIcon: false, // Dùng icon sáng
+               const StatusBar( // Dùng icon sáng
                 ),
               const SizedBox(height: 150),
               Container(
