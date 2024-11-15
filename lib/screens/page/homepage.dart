@@ -1,5 +1,11 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:p_cf/themes/statusbar.dart';
+import 'package:p_cf/db_test.dart/food.dart';
+import 'package:p_cf/screens/page/menu.dart';
+import 'package:p_cf/screens/page/profile.dart';
+import 'package:p_cf/screens/search/search.dart';
+import 'package:p_cf/widgets/status_bar.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -44,20 +50,21 @@ class HomeScreen extends StatelessWidget {
                     child: Icon(Icons.person, size: 30, color: Colors.white),
                   ),
                   const SizedBox(width: 16.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Welcome back!',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'N L D M Q',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                      ),
-                    ],
+                  Expanded( // Các phần tử này sẽ chiếm toàn bộ không gian còn lại
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Welcome back!',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'N L D M Q',
+                          style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 50,),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -70,7 +77,58 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-        
+
+
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Promotion',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            CarouselSlider(
+              items: foods.map((e) => Builder(builder: (context) {
+                return Stack(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.only(left: 10, bottom: 24),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage(e.backgroundImg),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.7),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              })).toList(),
+              options: CarouselOptions(
+                height: 200.0,
+                autoPlay: true,
+                enlargeCenterPage: true,
+              ),
+            ),
+
+
             // Phần Best Seller với danh sách ngang
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -146,6 +204,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
 
+
       // Thanh điều hướng phía dưới với Navigator
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -164,7 +223,7 @@ class HomeScreen extends StatelessWidget {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const GiftScreen()));
               break;
             case 4:
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
               break;
           }
         },
@@ -196,29 +255,6 @@ class HomeScreen extends StatelessWidget {
 }
 
 // Dummy screens for navigation
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Search')),
-      body: const Center(child: Text('Search Screen')),
-    );
-  }
-}
-
-class MenuScreen extends StatelessWidget {
-  const MenuScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Menu')),
-      body: const Center(child: Text('Menu Screen')),
-    );
-  }
-}
 
 class PromotionScreen extends StatelessWidget {
   const PromotionScreen({super.key});
@@ -244,14 +280,3 @@ class GiftScreen extends StatelessWidget {
   }
 }
 
-class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Account')),
-      body: const Center(child: Text('Account Screen')),
-    );
-  }
-}
