@@ -5,14 +5,22 @@ import 'package:flutter/services.dart';
 import 'package:p_cf/screens/start/welcome.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
-  const OTPVerificationScreen({super.key});
+  final String email; // Nhận email từ màn hình trước
+  final String purpose; // Xác định ngữ cảnh sử dụng: forgot_password hoặc login
+
+  const OTPVerificationScreen({
+    super.key,
+    required this.email,
+    required this.purpose,
+  });
 
   @override
   OTPVerificationScreenState createState() => OTPVerificationScreenState();
 }
 
 class OTPVerificationScreenState extends State<OTPVerificationScreen> {
-  final List<TextEditingController> _controllers = List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _controllers =
+      List.generate(4, (_) => TextEditingController());
   final int _resendTimeout = 30;
   Timer? _timer;
   int _currentTimer = 30;
@@ -53,20 +61,43 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
     setState(() {
       if (otp.isEmpty) {
-        _errorText = 'Please enter the OTP code';
-      } else if (otp != '1234') { // Thay thế '1234' bằng logic xác thực OTP thực tế
-        _errorText = 'Incorrect OTP code';
+        _errorText = 'Vui lòng nhập mã xác thực';
+      } else if (otp != '1234') { // Thay bằng logic xác thực OTP thực tế
+        _errorText = 'Mã xác thực không đúng';
       } else {
         _errorText = null;
-        // Xử lý khi xác thực OTP thành công
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const Welcome(),
-          ),
-        );
+
+        // Xử lý thành công dựa trên ngữ cảnh (purpose)
+        if (widget.purpose == 'forgot_password') {
+          // Điều hướng tới màn hình đặt lại mật khẩu
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Welcome(), // Đổi sang ResetPasswordScreen
+            ),
+          );
+        } else if (widget.purpose == 'login') {
+          // Xử lý xác thực email thành công khi đăng nhập
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Welcome(),
+            ),
+          );
+        }
       }
     });
+  }
+
+  void _resendCode() {
+    if (_currentTimer == 0) {
+      setState(() {
+        _startTimer();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mã xác thực đã được gửi lại!')),
+      );
+    }
   }
 
   @override
@@ -81,11 +112,13 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
             const SizedBox(height: 60),
             const BackButton(),
             const SizedBox(height: 40),
-            const Align(
+            Align(
               alignment: Alignment.center,
               child: Text(
-                'Xác thực',
-                style: TextStyle(
+                widget.purpose == 'forgot_password'
+                    ? 'Xác thực email - Quên mật khẩu'
+                    : 'Xác thực email - Đăng nhập',
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -93,11 +126,12 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            const Align(
+            Align(
               alignment: Alignment.center,
               child: Text(
-                'Nhập mã OTP mà chúng tôi đã gửi cho bạn',
-                style: TextStyle(
+                'Nhập mã xác thực đã được gửi đến email:\n${widget.email}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
                 ),
@@ -130,7 +164,7 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     ),
                     onChanged: (value) {
                       setState(() {
-                        _errorText = null; // Xóa lỗi khi nhập
+                        _errorText = null;
                       });
                       if (value.isNotEmpty && index < 3) {
                         FocusScope.of(context).nextFocus();
@@ -154,13 +188,16 @@ class OTPVerificationScreenState extends State<OTPVerificationScreen> {
               ),
             const SizedBox(height: 20),
             Center(
-              child: Text(
-                _currentTimer > 0
-                    ? 'Gửi lại sau 00:${_currentTimer.toString().padLeft(2, '0')}'
-                    : 'Gửi lại mã OTP',
-                style: TextStyle(
-                  color: _currentTimer > 0 ? Colors.black54 : Colors.blue,
-                  fontWeight: FontWeight.bold,
+              child: GestureDetector(
+                onTap: _resendCode,
+                child: Text(
+                  _currentTimer > 0
+                      ? 'Gửi lại sau 00:${_currentTimer.toString().padLeft(2, '0')}'
+                      : 'Gửi lại mã',
+                  style: TextStyle(
+                    color: _currentTimer > 0 ? Colors.black54 : Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
