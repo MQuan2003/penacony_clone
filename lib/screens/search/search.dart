@@ -20,12 +20,6 @@ class SearchScreenState extends State<SearchScreen> {
   ]; // Danh sách sản phẩm mẫu
   List<String> _filteredProducts = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _filteredProducts = _allProducts;
-  }
-
   void _searchProducts(String query) {
     final results = _allProducts.where((product) {
       return product.toLowerCase().contains(query.toLowerCase());
@@ -47,7 +41,10 @@ class SearchScreenState extends State<SearchScreen> {
             border: InputBorder.none,
             hintStyle: TextStyle(color: Colors.grey),
           ),
-          onChanged: _searchProducts,
+          onSubmitted: (value) {
+            // Chỉ tìm kiếm khi nhấn Enter
+            _searchProducts(value);
+          },
           style: const TextStyle(color: Colors.black),
         ),
         actions: [
@@ -55,47 +52,50 @@ class SearchScreenState extends State<SearchScreen> {
             icon: const Icon(Icons.clear, color: Colors.black),
             onPressed: () {
               _searchController.clear();
-              _searchProducts(''); // Hiển thị tất cả khi xóa tìm kiếm
+              setState(() {
+                _filteredProducts.clear(); // Ẩn danh sách khi xóa tìm kiếm
+              });
             },
           ),
         ],
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: _filteredProducts.length,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8.0),
-            child: ListTile(
-              title: Text(_filteredProducts[index]),
-              subtitle: const Text('Giá: 45.000đ'), // Giá mẫu cho mỗi sản phẩm
-              leading: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Image.asset(
-                  'assets/product_placeholder.png', // Thay thế bằng đường dẫn hình ảnh thực
-                  fit: BoxFit.cover,
-                ),
+      body: _filteredProducts.isEmpty
+          ? const Center(
+              child: Text(
+                'Hãy nhập tên sản phẩm để tìm kiếm.',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.add_shopping_cart),
-                onPressed: () {
-                  // Xử lý thêm sản phẩm vào giỏ hàng
-                },
-              ),
-              onTap: () {
-                // Xử lý khi chọn sản phẩm
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: _filteredProducts.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ListTile(
+                    title: Text(_filteredProducts[index]),
+                    subtitle: const Text('Giá: 45.000đ'), // Giá mẫu
+                    leading: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Image.asset(
+                        'assets/product_placeholder.png', // Thay bằng đường dẫn hình ảnh thực
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    onTap: () {
+                      // Xử lý khi chọn sản phẩm
+                    },
+                  ),
+                );
               },
             ),
-          );
-        },
-      ),
     );
   }
 }

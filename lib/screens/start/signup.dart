@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:p_cf/screens/start/otp.dart';
 import 'package:p_cf/themes/colors.dart';
 
 class Signup extends StatefulWidget {
@@ -13,7 +14,8 @@ class SignupScreenState extends State<Signup> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
@@ -41,30 +43,53 @@ class SignupScreenState extends State<Signup> {
       _passwordError = null;
       _confirmPasswordError = null;
 
+      // Biểu thức RegExp để kiểm tra email
+      final emailRegex =
+          RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+
+      // Biểu thức RegExp để kiểm tra độ mạnh của mật khẩu
+      final passwordRegex = RegExp(r"^(?=.*[A-Z])(?=.*\d).{8,}$");
+
       // Validate username
       if (_usernameController.text.isEmpty) {
-        _usernameError = 'Please enter your username';
+        _usernameError = 'Hãy nhập tên đăng nhập của bạn';
       }
 
       // Validate email
-      if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
-        _emailError = 'Please enter a valid email';
+      if (_emailController.text.isEmpty ||
+          !emailRegex.hasMatch(_emailController.text)) {
+        _emailError = 'Email không hợp lệ';
       }
 
       // Validate password
       if (_passwordController.text.isEmpty) {
-        _passwordError = 'Please enter your password';
+        _passwordError = 'Hãy nhập mật khẩu của bạn';
+      } else if (!passwordRegex.hasMatch(_passwordController.text)) {
+        _passwordError = 'Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số';
       }
 
       // Validate confirm password
       if (_confirmPasswordController.text != _passwordController.text) {
-        _confirmPasswordError = 'Passwords do not match';
+        _confirmPasswordError = 'Mật khẩu xác nhận không khớp';
       }
 
-      // If no errors, proceed (in real use, handle user registration logic here)
-      if (_usernameError == null && _emailError == null && _passwordError == null && _confirmPasswordError == null) {
-        // Navigate to the next screen if registration is successful
-        // Example: Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      // Nếu không có lỗi, tiếp tục xử lý
+      if (_usernameError == null &&
+          _emailError == null &&
+          _passwordError == null &&
+          _confirmPasswordError == null) {
+        // Thực hiện đăng ký
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const OTPVerificationScreen(
+              email: 'user@example.com', // Email từ màn hình trước
+              purpose: 'Đăng ký',
+            ),
+          ),
+        );
+
+        print('Đăng ký thành công!');
       }
     });
   }
@@ -80,21 +105,29 @@ class SignupScreenState extends State<Signup> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: TextField(
         controller: controller,
-        obscureText: isPasswordField && (isConfirmPassword ? _isConfirmPasswordVisible : _isPasswordVisible),
+        obscureText: isPasswordField &&
+            (isConfirmPassword
+                ? _isConfirmPasswordVisible
+                : _isPasswordVisible),
         decoration: InputDecoration(
           hintText: hintText,
           suffixIcon: isPasswordField
               ? IconButton(
                   icon: Icon(
-                    (isConfirmPassword ? _isConfirmPasswordVisible : _isPasswordVisible)
+                    (isConfirmPassword
+                            ? _isConfirmPasswordVisible
+                            : _isPasswordVisible)
                         ? Icons.visibility_off
                         : Icons.visibility,
                     color: Colors.black54,
                   ),
-                  onPressed: isConfirmPassword ? _toggleConfirmPasswordVisibility : _togglePasswordVisibility,
+                  onPressed: isConfirmPassword
+                      ? _toggleConfirmPasswordVisibility
+                      : _togglePasswordVisibility,
                 )
               : null,
-          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
@@ -107,10 +140,14 @@ class SignupScreenState extends State<Signup> {
         ),
         onTap: () {
           setState(() {
-            if (isPasswordField) {
-              _passwordError = null;
-            } else {
+            if (controller == _usernameController) {
               _usernameError = null;
+            } else if (controller == _emailController) {
+              _emailError = null;
+            } else if (controller == _passwordController) {
+              _passwordError = null;
+            } else if (controller == _confirmPasswordController) {
+              _confirmPasswordError = null;
             }
           });
         },
@@ -136,7 +173,7 @@ class SignupScreenState extends State<Signup> {
                   const Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                      'Create Account',
+                      'Chào mừng thành viên mới,',
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -148,7 +185,7 @@ class SignupScreenState extends State<Signup> {
                   const Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                      'Please fill in the details below.',
+                      'Hãy tạo tài khoản để tham gia cùng chúng tôi.',
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.black54,
@@ -156,12 +193,12 @@ class SignupScreenState extends State<Signup> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  
+
                   // Username field
                   const Padding(
                     padding: EdgeInsets.only(left: 12),
                     child: Text(
-                      'Username',
+                      'Tên đăng nhập',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -171,12 +208,12 @@ class SignupScreenState extends State<Signup> {
                   ),
                   const SizedBox(height: 8),
                   _buildTextField(
-                    hintText: 'Username',
+                    hintText: 'Tên đăng nhập',
                     controller: _usernameController,
                     errorText: _usernameError,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Email field
                   const Padding(
                     padding: EdgeInsets.only(left: 12),
@@ -201,7 +238,7 @@ class SignupScreenState extends State<Signup> {
                   const Padding(
                     padding: EdgeInsets.only(left: 12),
                     child: Text(
-                      'Password',
+                      'Mật khẩu',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -211,7 +248,7 @@ class SignupScreenState extends State<Signup> {
                   ),
                   const SizedBox(height: 8),
                   _buildTextField(
-                    hintText: 'Password',
+                    hintText: 'Mật khẩu',
                     controller: _passwordController,
                     isPasswordField: true,
                     errorText: _passwordError,
@@ -222,7 +259,7 @@ class SignupScreenState extends State<Signup> {
                   const Padding(
                     padding: EdgeInsets.only(left: 12),
                     child: Text(
-                      'Confirm Password',
+                      'Xác nhận mật khẩu',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -232,14 +269,14 @@ class SignupScreenState extends State<Signup> {
                   ),
                   const SizedBox(height: 8),
                   _buildTextField(
-                    hintText: 'Confirm Password',
+                    hintText: 'Xác nhận mật khẩu',
                     controller: _confirmPasswordController,
                     isPasswordField: true,
                     errorText: _confirmPasswordError,
                     isConfirmPassword: true,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Sign up button
                   Padding(
                     padding: const EdgeInsets.only(right: 20),
@@ -251,12 +288,13 @@ class SignupScreenState extends State<Signup> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          backgroundColor: AppColors.primary, // Màu nền của button
+                          backgroundColor:
+                              AppColors.primary, // Màu nền của button
                           padding: const EdgeInsets.symmetric(vertical: 25),
                           minimumSize: const Size(double.infinity, 50),
                         ),
                         child: const Text(
-                          'Sign Up',
+                          'Đăng ký',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -274,18 +312,19 @@ class SignupScreenState extends State<Signup> {
                       alignment: Alignment.bottomCenter,
                       child: Text.rich(
                         TextSpan(
-                          text: 'Already a member? ',
+                          text: 'Bạn đã có tài khoản? ',
                           style: const TextStyle(color: Colors.black),
                           children: [
                             TextSpan(
-                              text: 'Sign In',
+                              text: 'Đăng nhập',
                               style: const TextStyle(
                                 color: AppColors.orangepeel,
                                 fontWeight: FontWeight.bold,
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  Navigator.pop(context); // Quay lại trang đăng nhập
+                                  Navigator.pop(
+                                      context); // Quay lại trang đăng nhập
                                 },
                             ),
                           ],

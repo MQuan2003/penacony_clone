@@ -1,6 +1,15 @@
+// profile_screen.dart
+
 import 'package:flutter/material.dart';
+import 'package:p_cf/screens/page/account/account_detail_item.dart';
+import 'package:p_cf/screens/page/account/screens/change_password_screen.dart';
+import 'package:p_cf/screens/page/account/screens/personal_info_screen.dart';
+import 'package:p_cf/screens/page/gift/gift_home.dart';
 import 'package:p_cf/screens/page/homepage.dart';
-import 'package:p_cf/screens/page/menu.dart';
+import 'package:p_cf/screens/page/menu/menu.dart';
+import 'package:p_cf/screens/page/promotion/promotion_screen.dart';
+
+
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -34,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.green, backgroundColor: Colors.white,
               ),
-              child: const Text('Sign out'),
+              child: const Text('Đăng xuất'),
             ),
           ],
         ),
@@ -66,110 +75,96 @@ class ProfileScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Account details',
+                    'Thông tin tài khoản',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 16),
-                  AccountDetailItem(),
-                  AccountDetailItem(),
+                  AccountDetailItem(
+                    title: 'Thông tin cá nhân', 
+                    destination: UpdateProfileScreen(),
+                  ),
+                  AccountDetailItem(
+                    title: 'Đổi mật khẩu', 
+                    destination: ChangePasswordScreen(),
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
             // Thông tin cá nhân
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Account details',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 16),
-                  AccountDetailItem(),
-                  AccountDetailItem(),
-                ],
-              ),
-            ),
+            // const Padding(
+            //   padding: EdgeInsets.symmetric(horizontal: 16.0),
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: [
+            //       Text(
+            //         'Account details',
+            //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //       ),
+            //       SizedBox(height: 16),
+            //       AccountDetailItem(
+            //         title: 'Payment Methods', 
+            //         destination: PaymentMethodScreen(),
+            //       ),
+            //       AccountDetailItem(
+            //         title: 'Notifications', 
+            //         destination: NotificationScreen(),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),
       // Thanh điều hướng dưới cùng
+
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+              );
               break;
             case 1:
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const MenuScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MenuScreen()),
+              );
               break;
             case 2:
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const PromotionScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const PromotionScreen()),
+              );
               break;
             case 3:
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const GiftScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const GiftPage()),
+              );
               break;
             case 4:
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
               break;
           }
         },
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+              icon: Icon(Icons.restaurant_menu), label: 'Menu'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
-            label: 'Menu',
-          ),
+              icon: Icon(Icons.local_offer), label: 'Khuyến mãi'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.local_offer),
-            label: 'Promotion',
-          ),
+              icon: Icon(Icons.card_giftcard), label: 'Quà tặng'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.card_giftcard),
-            label: 'Gift',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Account',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Widget cho mỗi mục thông tin cá nhân
-class AccountDetailItem extends StatelessWidget {
-  const AccountDetailItem({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Personal information',
-            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-          ),
-          Switch(
-            value: true,
-            onChanged: (bool value) {
-              // Chức năng khi bật tắt
-            },
-          ),
+              icon: Icon(Icons.account_circle), label: 'Tài khoản'),
         ],
       ),
     );

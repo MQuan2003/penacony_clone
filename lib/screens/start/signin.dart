@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:p_cf/db_test.dart/credentials.dart';
 import 'package:p_cf/screens/page/homepage.dart';
 import 'package:p_cf/screens/start/signup.dart';
+import 'package:p_cf/screens/start/forget_password.dart';
 
 import 'package:p_cf/themes/colors.dart';
 
@@ -124,7 +125,7 @@ class SigninScreenState extends State<Signin> {
                   const Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                      'Hello,',
+                      'Xin chào,',
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -136,7 +137,7 @@ class SigninScreenState extends State<Signin> {
                   const Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                      'Welcome back!',
+                      'Chào mừng bạn quay trở lại!',
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.black54,
@@ -148,7 +149,7 @@ class SigninScreenState extends State<Signin> {
                   const Padding(
                     padding: EdgeInsets.only(left: 12), // Thụt vào như ô nhập liệu
                     child: Text(
-                      'Username', // Nhãn cho ô nhập username
+                      'Tên đăng nhập', // Nhãn cho ô nhập username
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -158,7 +159,7 @@ class SigninScreenState extends State<Signin> {
                   ),
                 const SizedBox(height: 8), // Khoảng cách giữa nhãn và ô nhập
                   _buildTextField(
-                    hintText: 'Username',
+                    hintText: 'Tên đăng nhập',
                     //icon: Icons.email_outlined,
                     controller: _usernameController,
                     errorText: _usernameError,
@@ -168,7 +169,7 @@ class SigninScreenState extends State<Signin> {
                   const Padding(
                     padding: EdgeInsets.only(left: 12), // Thụt vào như ô nhập liệu
                     child: Text(
-                      'Password', // Nhãn cho ô nhập password
+                      'Mật khẩu', // Nhãn cho ô nhập password
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -178,7 +179,7 @@ class SigninScreenState extends State<Signin> {
                   ),
                   const SizedBox(height: 8), // Khoảng cách giữa nhãn và ô nhập
                   _buildTextField(
-                    hintText: 'Password',
+                    hintText: 'Mật khẩu',
                     //icon: Icons.lock_outline,
                     controller: _passwordController,
                     isPasswordField: true,
@@ -192,14 +193,14 @@ class SigninScreenState extends State<Signin> {
                       alignment: Alignment.topLeft,
                       child: Text.rich(
                         TextSpan(
-                          text: 'Forgot password?',
+                          text: 'Quên mật khẩu?',
                           style: const TextStyle(
                             color: AppColors.orangepeel,
                             fontWeight: FontWeight.bold,
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              // Handle forgot password action
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPassword()));
                             },
                         ),
                       ),
@@ -221,7 +222,7 @@ class SigninScreenState extends State<Signin> {
                         minimumSize: const Size(double.infinity, 50), // Chiều rộng button là full và chiều cao là 50
                       ),
                       child: const Text(
-                        'Sign In', // Thay vì icon, bạn có thể sử dụng text ở đây
+                        'Đăng nhập', // Thay vì icon, bạn có thể sử dụng text ở đây
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16, // Điều chỉnh kích thước chữ
@@ -238,11 +239,11 @@ class SigninScreenState extends State<Signin> {
                       alignment: Alignment.bottomCenter,
                       child: Text.rich(
                         TextSpan(
-                          text: 'New member? ',
+                          text: 'Bạn là thành viên mới? ',
                           style: const TextStyle(color: Colors.black),
                           children: [
                             TextSpan(
-                              text: 'Sign up',
+                              text: 'Đăng ký',
                               style: const TextStyle(
                                 color: AppColors.orangepeel,
                                 fontWeight: FontWeight.bold,
