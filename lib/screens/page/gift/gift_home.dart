@@ -53,16 +53,16 @@ class GiftPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: Column(
                     children: [
-                      Image.asset(
-                        'assets/barcode.png', // Replace with a valid barcode asset
-                        height: 50,
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
+                      // Image.asset(
+                      //   'assets/barcode.png', // Replace with a valid barcode asset
+                      //   height: 50,
+                      // ),
+                      SizedBox(height: 8),
+                      Text(
                         'MV100203',
                         style: TextStyle(color: Colors.white),
                       ),
