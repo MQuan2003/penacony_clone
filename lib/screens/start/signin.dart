@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:p_cf/db_test.dart/credentials.dart';
+import 'package:p_cf/database/repository/user_repository.dart';
+
 import 'package:p_cf/screens/page/homepage.dart';
 import 'package:p_cf/screens/start/signup.dart';
 import 'package:p_cf/screens/start/forget_password.dart';
@@ -17,6 +18,7 @@ class Signin extends StatefulWidget {
 class SigninScreenState extends State<Signin> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final UserRepository _userRepository = UserRepository();
   bool _isPasswordVisible = false;
 
   String? _usernameError;
@@ -28,34 +30,53 @@ class SigninScreenState extends State<Signin> {
     });
   }
 
-  void _validateCredentials() {
+  void _validateCredentials() async {
+  setState(() {
+    _usernameError = null;
+    _passwordError = null;
+  });
+
+  // Validate username
+  if (_usernameController.text.isEmpty) {
     setState(() {
-      _usernameError = null;
-      _passwordError = null;
-
-      // Validate username
-      if (_usernameController.text.isEmpty) {
-        _usernameError = 'Please enter your username';
-      }
-
-      // Validate password
-      if (_passwordController.text.isEmpty) {
-        _passwordError = 'Please enter your password';
-      }
-
-      // Check credentials if no errors
-      if (_usernameError == null && _passwordError == null) {
-        if (_usernameController.text != Credentials.username ||
-            _passwordController.text != Credentials.password) {
-          _usernameError = 'Incorrect username or password';
-          _passwordError = 'Incorrect username or password';
-        } else {
-          // Navigate to the next screen if login is successful
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-        }
-      }
+      _usernameError = 'Please enter your username';
     });
   }
+
+  // Validate password
+  if (_passwordController.text.isEmpty) {
+    setState(() {
+      _passwordError = 'Please enter your password';
+    });
+  }
+
+  // Nếu không có lỗi, kiểm tra thông tin đăng nhập
+  if (_usernameError == null && _passwordError == null) {
+    try {
+      // Kiểm tra người dùng trong cơ sở dữ liệu
+      final user = await _userRepository.loginUser(
+        _usernameController.text,
+        _passwordController.text,
+      );
+
+      if (user == null) {
+        setState(() {
+          _usernameError = 'Sai tên đăng nhập hoặc mật khẩu';
+          _passwordError = 'Sai tên đăng nhập hoặc mật khẩu';
+        });
+      } else {
+        // Chuyển sang HomeScreen nếu đăng nhập thành công
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      print('Lỗi khi đăng nhập: $e');
+    }
+  }
+}
+
 
   Widget _buildTextField({
     required String hintText,

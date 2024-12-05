@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:p_cf/screens/start/otp.dart';
+import 'package:p_cf/database/repository/user_repository.dart';
+import 'package:p_cf/screens/start/signin.dart';
 import 'package:p_cf/themes/colors.dart';
 
 class Signup extends StatefulWidget {
@@ -16,6 +17,7 @@ class SignupScreenState extends State<Signup> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final UserRepository _userRepository = UserRepository();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
@@ -36,62 +38,83 @@ class SignupScreenState extends State<Signup> {
     });
   }
 
-  void _validateCredentials() {
+  void _validateCredentials() async {
+    // Thực hiện các bước kiểm tra đầu vào đồng bộ
     setState(() {
       _usernameError = null;
       _emailError = null;
       _passwordError = null;
       _confirmPasswordError = null;
-
-      // Biểu thức RegExp để kiểm tra email
-      final emailRegex =
-          RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-
-      // Biểu thức RegExp để kiểm tra độ mạnh của mật khẩu
-      final passwordRegex = RegExp(r"^(?=.*[A-Z])(?=.*\d).{8,}$");
-
-      // Validate username
-      if (_usernameController.text.isEmpty) {
-        _usernameError = 'Hãy nhập tên đăng nhập của bạn';
-      }
-
-      // Validate email
-      if (_emailController.text.isEmpty ||
-          !emailRegex.hasMatch(_emailController.text)) {
-        _emailError = 'Email không hợp lệ';
-      }
-
-      // Validate password
-      if (_passwordController.text.isEmpty) {
-        _passwordError = 'Hãy nhập mật khẩu của bạn';
-      } else if (!passwordRegex.hasMatch(_passwordController.text)) {
-        _passwordError = 'Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số';
-      }
-
-      // Validate confirm password
-      if (_confirmPasswordController.text != _passwordController.text) {
-        _confirmPasswordError = 'Mật khẩu xác nhận không khớp';
-      }
-
-      // Nếu không có lỗi, tiếp tục xử lý
-      if (_usernameError == null &&
-          _emailError == null &&
-          _passwordError == null &&
-          _confirmPasswordError == null) {
-        // Thực hiện đăng ký
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const OTPVerificationScreen(
-              email: 'user@example.com', // Email từ màn hình trước
-              purpose: 'Đăng ký',
-            ),
-          ),
-        );
-
-        print('Đăng ký thành công!');
-      }
     });
+
+    // Biểu thức RegExp để kiểm tra email
+    final emailRegex =
+        RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+
+    // Biểu thức RegExp để kiểm tra độ mạnh của mật khẩu
+    final passwordRegex = RegExp(r"^(?=.*[A-Z])(?=.*\d).{8,}$");
+
+    // Validate username
+    if (_usernameController.text.isEmpty) {
+      setState(() => _usernameError = 'Tên đăng nhập không được để trống');
+      return;
+    }
+
+    // Validate email
+    if (_emailController.text.isEmpty) {
+      setState(() => _emailError = 'Email không được bỏ trống');
+      return;
+    } else if (!emailRegex.hasMatch(_emailController.text)) {
+      setState(() => _emailError = 'Email không hợp lệ');
+      return;
+    }
+
+    // Validate password
+    if (_passwordController.text.isEmpty) {
+      setState(() => _passwordError = 'Hãy nhập mật khẩu của bạn');
+      return;
+    } else if (!passwordRegex.hasMatch(_passwordController.text)) {
+      setState(() => _passwordError =
+          'Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số');
+      return;
+    }
+
+    // Validate confirm password
+    if (_confirmPasswordController.text != _passwordController.text) {
+      setState(() => _confirmPasswordError = 'Mật khẩu xác nhận không khớp');
+      return;
+    }
+
+    // Nếu không có lỗi, tiếp tục xử lý đăng ký người dùng
+    try {
+      // Kiểm tra trùng lặp người dùng
+      final userExists = await _userRepository.checkUserExists(
+        _usernameController.text,
+        _emailController.text,
+      );
+
+      if (userExists) {
+        setState(() {
+          _emailError = 'Tên đăng nhập hoặc email đã tồn tại';
+        });
+        return;
+      }
+
+      // Thêm người dùng vào database
+      await _userRepository.registerUser(
+        _usernameController.text,
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      // Chuyển sang màn hình đăng nhập nếu đăng ký thành công
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Signin()),
+      );
+    } catch (e) {
+      print('Lỗi khi đăng ký: $e');
+    }
   }
 
   Widget _buildTextField({

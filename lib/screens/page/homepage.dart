@@ -163,7 +163,7 @@ class HomeScreen extends StatelessWidget {
 
           // Phần tiêu đề cố định
           Container(
-            height: 75.0,
+            height: 100.0,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
