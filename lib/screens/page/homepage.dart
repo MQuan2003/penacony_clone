@@ -1,27 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:p_cf/db_test.dart/food.dart';
+import 'package:p_cf/database/repository/promotion_repository.dart';
+import 'package:p_cf/screens/page/account/profile.dart';
 import 'package:p_cf/screens/page/gift/gift_home.dart';
 import 'package:p_cf/screens/page/menu/menu.dart';
-import 'package:p_cf/screens/page/account/profile.dart';
+import 'package:p_cf/screens/page/promotion/detail_promotion_screen.dart';
 import 'package:p_cf/screens/page/promotion/promotion_screen.dart';
 import 'package:p_cf/screens/search/search.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final PromotionRepository promotionRepository = PromotionRepository();
+  List<Promotion> promotions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPromotions();
+  }
+
+  Future<void> _loadPromotions() async {
+    final loadedPromotions = await promotionRepository.getPromotions();
+    setState(() {
+      promotions = loadedPromotions;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Nội dung cuộn
           SingleChildScrollView(
-            padding: const EdgeInsets.only(top: 75.0), // Đẩy xuống dưới tiêu đề
+            padding: const EdgeInsets.only(top: 75.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Phần thông tin người dùng và ô tìm kiếm
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
@@ -77,8 +97,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Phần Carousel
+                // Carousel hiển thị khuyến mãi
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
@@ -87,17 +106,33 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                CarouselSlider(
-                  items: foods
-                      .map((e) => Builder(builder: (context) {
-                            return Stack(
+                promotions.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : CarouselSlider(
+                        items: promotions.map((promotion) {
+                          return GestureDetector(
+                            onTap: () {
+                              // Điều hướng đến trang chi tiết
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailPromotionScreen(
+                                    title: promotion.title,
+                                    description: promotion.description,
+                                    expiration: promotion.endDate,
+                                    image: promotion.image,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Stack(
                               children: [
                                 Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 8.0),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(14),
                                     image: DecorationImage(
-                                      image: AssetImage(e.backgroundImg),
+                                      image: AssetImage(promotion.image),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -110,60 +145,39 @@ class HomeScreen extends StatelessWidget {
                                         Colors.black.withOpacity(0.6),
                                         Colors.transparent,
                                       ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 10,
+                                  left: 10,
+                                  child: Text(
+                                    promotion.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                               ],
-                            );
-                          }))
-                      .toList(),
-                  options: CarouselOptions(
-                    height: 200.0,
-                    autoPlay: true,
-                    enlargeCenterPage: true,
-                  ),
-                ),
-
-                const SizedBox(height: 20.0),
-
-                // Phần Best Seller
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'Best Seller',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                SizedBox(
-                  height: 140, // Chiều cao của danh sách
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: foods.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        width: 140, // Chiều rộng mỗi item
-                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.0),
-                          image: DecorationImage(
-                            image: AssetImage(foods[index].backgroundImg),
-                            fit: BoxFit.cover,
-                          ),
+                            ),
+                          );
+                        }).toList(),
+                        options: CarouselOptions(
+                          height: 200.0,
+                          autoPlay: true,
+                          enlargeCenterPage: true,
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
               ],
             ),
           ),
-
           // Phần tiêu đề cố định
           Container(
-            height: 100.0,
+            height: 90.0,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -186,8 +200,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-
-      // Thanh điều hướng
+      
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: (index) {

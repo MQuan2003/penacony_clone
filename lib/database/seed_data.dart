@@ -95,15 +95,15 @@ class SampleDataManager {
           startDate: '2024-12-01',
           endDate: '2024-12-15',
         ),
-        Promotion(
-          id: 6,
-          title: 'Tặng 1 Ly Trà Đào Cho Hóa Đơn Trên 100K',
-          description:
-              'Nhận ngay 1 ly trà đào cam sả miễn phí khi hóa đơn đạt từ 100,000đ. Ưu đãi áp dụng từ 01/12 đến 20/12/2024.',
-          image: 'assets/images/promo6.webp',
-          startDate: '2024-12-01',
-          endDate: '2024-12-20',
-        ),
+        // Promotion(
+        //   id: 6,
+        //   title: 'Tặng 1 Ly Trà Đào Cho Hóa Đơn Trên 100K',
+        //   description:
+        //       'Nhận ngay 1 ly trà đào cam sả miễn phí khi hóa đơn đạt từ 100,000đ. Ưu đãi áp dụng từ 01/12 đến 20/12/2024.',
+        //   image: 'assets/images/promo6.webp',
+        //   startDate: '2024-12-01',
+        //   endDate: '2024-12-20',
+        // ),
       ];
       for (var promotion in samplePromotions) {
         await repo.insertPromotion(promotion);
