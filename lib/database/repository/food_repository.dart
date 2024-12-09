@@ -68,6 +68,17 @@ class FoodRepository {
     return null;
   }
 
+  Future<List<Food>> getBestSellers() async {
+    final db = await _dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'foods',
+      where: 'is_best_seller = ?',
+      whereArgs: [1],
+    );
+
+    return List.generate(maps.length, (i) => Food.fromMap(maps[i]));
+  }
+
   Future<void> insertFood(Food food) async {
     final db = await _dbHelper.database;
     await db.insert('foods', food.toMap());
@@ -90,5 +101,24 @@ class FoodRepository {
       where: 'food_id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<List<Food>> getAllFoodsSortedByPrice() async {
+    final db = await _dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'foods',
+      orderBy: 'price ASC',
+    );
+    return List.generate(maps.length, (i) => Food.fromMap(maps[i]));
+  }
+
+  Future<List<Map<String, dynamic>>> fetchBestSellerFoods() async {
+    final db = await DatabaseHelper().database;
+    final results = await db.query(
+      'food',
+      where: 'is_best_seller = ?',
+      whereArgs: [1], // Chỉ lấy các món ăn là best seller
+    );
+    return results;
   }
 }

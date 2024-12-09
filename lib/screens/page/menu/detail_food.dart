@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:p_cf/db_test.dart/food.dart';
 
 class FoodDetailScreen extends StatelessWidget {
-  final Food food;
+  final Map<String, dynamic> food;
+  final String previousPageTitle;
 
-  const FoodDetailScreen({super.key, required this.food});
+  const FoodDetailScreen({
+    super.key,
+    required this.food,
+    this.previousPageTitle = 'Chi tiết món ăn',
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chi tiết món ăn'),
+        title: Text(previousPageTitle),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -24,35 +29,48 @@ class FoodDetailScreen extends StatelessWidget {
                 height: 200,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.0),
-                  image: DecorationImage(
-                    image: AssetImage(food.backgroundImg),  // Đường dẫn ảnh nền của món ăn
-                    fit: BoxFit.cover,
-                  ),
+                  image: food['image'] != null
+                      ? DecorationImage(
+                          image: NetworkImage(food['image']),
+                          fit: BoxFit.cover,
+                        )
+                      : const DecorationImage(
+                          image: AssetImage('assets/images/default_food.png'),
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               const SizedBox(height: 16.0),
 
               // Tên món ăn
               Text(
-                food.title,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                food['name'] ?? 'Không rõ tên',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8.0),
 
               // Giá món ăn
               Text(
-                '${food.price}đ',
-                style: const TextStyle(fontSize: 20, color: Colors.orange),
+                food['price'] != null
+                    ? '${food['price'].toString()}đ'
+                    : 'Không rõ giá',
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.orange,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16.0),
 
               // Mô tả món ăn
-              const Text(
-                'Đây là mô tả chi tiết về món ăn, bao gồm các thành phần, hương vị, cách chế biến, và các thông tin khác để khách hàng hiểu rõ hơn về món ăn.',
-                style: TextStyle(fontSize: 16),
+              Text(
+                food['description'] ?? 'Không có mô tả cho món ăn này.',
+                style: const TextStyle(fontSize: 16, height: 1.5),
               ),
               const SizedBox(height: 24.0),
-
             ],
           ),
         ),
